@@ -12,10 +12,10 @@ NNODES=1
 NODE_RANK=0
 WORLD_SIZE=$(($GPUS_PER_NODE*$NNODES))
 
-CHECKPOINT_PATH=<Specify path>
-VOCAB_FILE=<Specify path to file>/gpt2-vocab.json
-MERGE_FILE=<Specify path to file>/gpt2-merges.txt
-DATA_PATH=<Specify path and file prefix>_text_document
+# CHECKPOINT_PATH=<Specify path>
+VOCAB_FILE=/workspace/Megatron-DeepSpeed-main/gpt2-vocab.json
+MERGE_FILE=/workspace/Megatron-DeepSpeed-main/gpt2-merges.txt 
+DATA_PATH=/workspace/Megatron-LM-2.6/datasets/bpe_openwebtext_text_document
 
 DISTRIBUTED_ARGS="
     --nproc_per_node $GPUS_PER_NODE \
@@ -26,8 +26,8 @@ DISTRIBUTED_ARGS="
 "
 
 GPT_ARGS="
-    --tensor-model-parallel-size 2 \
-    --pipeline-model-parallel-size 2 \
+    --tensor-model-parallel-size 8 \
+    --pipeline-model-parallel-size 1 \
     --sequence-parallel \
     --num-layers 24 \
     --hidden-size 1024 \
@@ -58,7 +58,6 @@ OUTPUT_ARGS="
     --log-interval 100 \
     --save-interval 10000 \
     --eval-interval 1000 \
-    --eval-iters 10
 "
 
 torchrun $DISTRIBUTED_ARGS pretrain_gpt.py \
@@ -66,6 +65,6 @@ torchrun $DISTRIBUTED_ARGS pretrain_gpt.py \
     $DATA_ARGS \
     $OUTPUT_ARGS \
     --distributed-backend nccl \
-    --save $CHECKPOINT_PATH \
-    --load $CHECKPOINT_PATH
+    # --save $CHECKPOINT_PATH \
+    # --load $CHECKPOINT_PATH
 
